@@ -1,83 +1,70 @@
-from flask import Flask, render_template, request
+import streamlit as st
 import pandas as pd
-from sklearn.preprocessing import LabelEncoder
 import pickle
-
-app = Flask(__name__)
+from sklearn.preprocessing import LabelEncoder
 
 # -------------------------
 # Load data and model
 # -------------------------
-df = pd.read_csv("train.csv")  # Your CSV file with all features
+df = pd.read_csv("train.csv")  # make sure this is your original training CSV
 
 # Encode locations
 le = LabelEncoder()
 df['Location_encoded'] = le.fit_transform(df['Location'])
-locations = list(le.classes_)  # ['Kharghar', 'Powai', ...]
+locations = list(le.classes_)  # e.g., ['Kharghar', 'Powai', ...]
 
-# Load your trained model
-# Load your trained model
+# Load trained model
 model = pickle.load(open("model.pkl", "rb"))
 
-
 # -------------------------
-# Routes
+# Streamlit App
 # -------------------------
-@app.route("/", methods=["GET", "POST"])
-def index():
-    if request.method == "POST":
-        # Get form data
-        area = float(request.form['Area'])
-        bedrooms = int(request.form['Bedrooms'])
-        location_name = request.form['Location']
+st.title("🏠 House Price Prediction")
 
-        # Optional: binary features
-        gym = int(request.form.get('Gymnasium', 0))
-        lift = int(request.form.get('Lift', 0))
-        car_parking = int(request.form.get('Car_Parking', 0))
-        maintenance = int(request.form.get('Maintenance_Staff', 0))
-        security = int(request.form.get('Security_24x7', 0))
-        children_play = int(request.form.get('Childrens_Play_Area', 0))
-        clubhouse = int(request.form.get('Clubhouse', 0))
-        intercom = int(request.form.get('Intercom', 0))
-        gardens = int(request.form.get('Landscaped_Gardens', 0))
-        indoor_games = int(request.form.get('Indoor_Games', 0))
-        gas = int(request.form.get('Gas_Connection', 0))
-        jogging = int(request.form.get('Jogging_Track', 0))
-        swimming = int(request.form.get('Swimming_Pool', 0))
-        new_resale = int(request.form.get('New_Resale', 0))
+st.write("Fill in the details below to predict the house price:")
 
-        # Convert location name to encoded number
+# User Inputs
+area = st.number_input("Area (in sq ft)", min_value=100, max_value=5000, value=1000)
+bedrooms = st.number_input("Number of Bedrooms", min_value=1, max_value=10, value=2)
+location_name = st.selectbox("Select Location", locations)
+
+# Amenities / features expected by model (8 features)
+new_resale = st.checkbox("New / Resale (New = checked)")  # 1 = new, 0 = resale
+gymnasium = st.checkbox("Gymnasium")
+lift = st.checkbox("Lift Available")
+car_parking = st.checkbox("Car Parking")
+maintenance_staff = st.checkbox("Maintenance Staff")
+
+# Predict button
+if st.button("Predict Price"):
+    # Encode location
+    try:
         location_encoded = le.transform([location_name])[0]
+    except:
+        st.error("Location not recognized!")
+        st.stop()
 
-        # Prepare features in correct order (adjust according to your model)
-        features = [[
-            area,
-            bedrooms,
-            new_resale,
-            gym,
-            lift,
-            car_parking,
-            maintenance,
-            security,
-            children_play,
-            clubhouse,
-            intercom,
-            gardens,
-            indoor_games,
-            gas,
-            jogging,
-            swimming,
-            location_encoded
-        ]]
+    # Prepare features in order
+    features = [[
+        area,
+        bedrooms,
+        location_encoded,
+        int(new_resale),
+        int(gymnasium),
+        int(lift),
+        int(car_parking),
+        int(maintenance_staff)
+    ]]
 
-        # Predict price
-        predicted_price = model.predict(features)[0]
+    # Debug: Show features
+    st.write("Features sent to model:", features)
 
-        return render_template("index.html", locations=locations, prediction=predicted_price)
+    # Predict price
+    predicted_price = model.predict(features)[0]
 
-    return render_template("index.html", locations=locations, prediction=None)
+    # Display result in lakhs if too big
+    if predicted_price > 1_00_000:
+        st.success(f"🏷️ Predicted House Price: ₹{predicted_price:,.0f}")
+    else:
+        st.success(f"🏷️ Predicted House Price: ₹{predicted_price:,.0f}")
 
-# -------------------------
-if __name__ == "__main__":
-    app.run(debug=True)
