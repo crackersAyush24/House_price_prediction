@@ -1,59 +1,53 @@
-from matplotlib import pyplot as plt
 import pandas as pd
+import numpy as np
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestRegressor
+from xgboost import XGBRegressor
 from sklearn.metrics import r2_score
-import pickle as pkl
-import seaborn as sns
-import numpy as np
+import pickle
 
-rfc = RandomForestRegressor()
-
-data = pd.read_csv('train.csv')
+data = pd.read_csv("train.csv")
 
 le = LabelEncoder()
-data['Location'] = le.fit_transform(data['Location'])
-data['Price'] = np.log(data['Price'])
+data["Location_encoded"] = le.fit_transform(data["Location"])
 
-x = data.drop(["id","Price", "Lift Available",'Clubhouse', "Maintenance Staff","24x7 Security", "Children's Play Area", "Intercom",'Swimming Pool','Gas Connection', "Landscaped Gardens"], axis =1)
-y = data['Price']
+data["Price_log"] = np.log(data["Price"])
 
-q1 = x['Area'].quantile(0.25)
-q3 = x['Area'].quantile(0.75)
+x = data[[
+    "Area", "No. of Bedrooms", "Location_encoded",
+    "New/Resale", "Gymnasium", "Lift Available",
+    "Car Parking", "Maintenance Staff", "24x7 Security",
+    "Children's Play Area", "Clubhouse", "Intercom",
+    "Landscaped Gardens", "Indoor Games", "Gas Connection",
+    "Jogging Track", "Swimming Pool"
+]]
 
-iqr = q3-q1
+y = data["Price_log"]
 
-u = q3 + 1.5*iqr
-l = q1 - 1.5*iqr
+x["Area"] = np.clip(x["Area"], x["Area"].quantile(0.05), x["Area"].quantile(0.95))
+y = np.clip(y, y.quantile(0.05), y.quantile(0.95))
 
-out1 = x[x['Area'] < l].values
-out2 = x[x['Area'] > u].values
+x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.7, random_state=42)
 
-x['Area'].replace(out1,l,inplace = True)
-x['Area'].replace(out2,u,inplace = True)
+model = XGBRegressor(
+    n_estimators=500,
+    learning_rate=0.05,
+    max_depth=6,
+    subsample=0.8,
+    colsample_bytree=0.8,
+    random_state=42
+)
 
-# Price
-q1 = y.quantile(0.25)
-q3 = y.quantile(0.75)
+model.fit(x_train, y_train)
 
-iqr = q3-q1
+y_pred = model.predict(x_test)
+print("R2 score:", r2_score(y_test, y_pred))
 
-u = q3 + 1.5*iqr
-l = q1 - 1.5*iqr
+pickle.dump(model, open("model_xgb.pkl", "wb"))
+pickle.dump(le, open("label_encoder.pkl", "wb"))
+import pickle
 
-out1 = y[y < l].values
-out2 = y[y > u].values
-
-y.replace(out1,l,inplace = True)
-y.replace(out2,u,inplace = True)
-
-
-x_train, x_test, y_train, y_test=train_test_split(x, y, random_state=0, train_size=0.3)
-
-rfc.fit(x_train,y_train)
-y_pred = rfc.predict(x_test)
-
-print(r2_score(y_test,y_pred))
-
-pkl.dump(rfc, open('model.pkl','wb'))
+# Save model columns for Streamlit app
+model_columns = list(x.columns)  # x = your features DataFrame
+with open("model_columns.pkl", "wb") as f:
+    pickle.dump(model_columns, f)
