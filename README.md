@@ -101,6 +101,33 @@ streamlit run app.py
 
 
 ```
+House-Price-Prediction-main/
+├── app.py                  # Streamlit app
+├── Main.py                 # Model training script
+├── train.csv               # Dataset
+├── model_xgb.pkl           # XGBoost model
+├── model.pkl               # Random Forest model
+├── label_encoder.pkl       # Label encoder
+├── model_columns.pkl       # Columns used in model
+├── images/                 # Optional images
+├── templates/              # Optional templates
+├── README.md
+└── venv/                   # Virtual environment
+```
+
+---
+
+## Future Improvements
+
+* Add **more features**: nearby schools, hospitals, transportation.
+* Apply **hyperparameter tuning** for higher accuracy.
+* Deploy the app on **cloud platforms** like Heroku, AWS, or Streamlit Cloud.
+* Include **explainable AI** features to show which factors affect price predictions.
+
+---
+
+```
+
 
 
 
