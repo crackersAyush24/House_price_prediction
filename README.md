@@ -33,9 +33,74 @@ This project predicts house prices using a dataset containing multiple features.
 - Saves models, label encoders, and column info as `.pkl` files for reuse.  
 
 ---
+## Technologies
+
+- Python 3  
+- Pandas, NumPy  
+- Scikit-learn  
+- XGBoost  
+- Streamlit  
+- Pickle  
+
+---
+
+## Setup & Installation
+
+1. **Clone the repository**:
+
+```bash
+git clone <repository-url>
+cd House-Price-Prediction-main
+````
+
+2. **Create a virtual environment**:
+
+```bash
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+3. **Install dependencies**:
+
+```bash
+pip install -r requirements.txt
+# If requirements.txt not available, install manually:
+pip install pandas numpy scikit-learn xgboost streamlit
+```
+
+---
+
+## Usage
+
+1. **Train the models**:
+
+```bash
+python Main.py
+```
+
+This will generate:
+
+* `model_xgb.pkl` – XGBoost model
+* `model.pkl` – Random Forest model
+* `label_encoder.pkl` – LabelEncoder for categorical features
+* `model_columns.pkl` – Columns used for prediction
+
+2. **Run the Streamlit app**:
+
+```bash
+streamlit run app.py
+```
+
+* Open [http://localhost:8501](http://localhost:8501) in your browser.
+* Enter house details and get predicted price.
+
+---
+
+## Project Structure
 
 
 
 ```
+
 
 
