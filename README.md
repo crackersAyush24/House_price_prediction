@@ -51,3 +51,54 @@ A **Streamlit web interface** lets users input property details and get instant,
 ---
 
 
+## ⚙️ Setup & Installation
+
+1. **Clone the Repository**
+   ```bash
+   git clone <repository-url>
+   cd House-Price-Prediction-main
+Create and Activate Virtual Environment
+python3 -m venv venv
+source venv/bin/activate   # On Windows: venv\Scripts\activate
+Install Dependencies
+pip install -r requirements.txt
+# If requirements.txt not available:
+pip install pandas numpy scikit-learn xgboost streamlit
+🚀 Usage
+🏋️‍♂️ Train the Models
+Run the main script to train models and generate serialized files:
+python Main.py
+This will create:
+model_xgb.pkl → XGBoost model
+model.pkl → Random Forest model
+label_encoder.pkl → Encodes categorical features
+model_columns.pkl → Stores model feature names
+🌐 Launch the Web App
+Start the Streamlit app:
+streamlit run app.py
+Then open http://localhost:8501 in your browser.
+Enter property details (like area, location, etc.) and get real-time price predictions instantly!
+📂 Project Structure
+House-Price-Prediction-main/
+├── app.py                # Streamlit web app
+├── Main.py               # Model training script
+├── train.csv             # Dataset
+├── model_xgb.pkl         # Trained XGBoost model
+├── model.pkl             # Trained Random Forest model
+├── label_encoder.pkl     # Label encoder for categorical features
+├── model_columns.pkl     # Feature names used by the model
+├── images/               # Optional images for documentation
+├── templates/            # Optional HTML templates
+├── README.md             # Project documentation
+└── venv/                 # Virtual environment (excluded in .gitignore)
+🌱 Future Improvements
+🔍 Add location-based features like nearby schools, hospitals, and transport access.
+🎯 Implement hyperparameter tuning for better model accuracy.
+☁️ Deploy the Streamlit app on Heroku, AWS, or Streamlit Cloud.
+🧾 Integrate Explainable AI (XAI) to show feature importance in predictions.
+📊 Add visualization dashboards for deeper insights.
+💡 Author
+Ayush Chaubey
+📧 [mailto:ayushchaubey04@gmail.com]
+💻 Passionate about AI, Data Science & Real-World ML Applications.
+"Turning data into insight — and insight into action." 🚀
