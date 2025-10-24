@@ -38,5 +38,16 @@ A **Streamlit web interface** lets users input property details and get instant,
 ---
 
 
+## 🧠 Technologies Used
+
+| Category | Tools & Libraries |
+|-----------|------------------|
+| **Programming Language** | Python 3 |
+| **Data Processing** | Pandas, NumPy |
+| **Machine Learning** | Scikit-learn, XGBoost |
+| **Deployment / UI** | Streamlit |
+| **Model Persistence** | Pickle |
+
+---
 
 
